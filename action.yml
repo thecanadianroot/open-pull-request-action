@@ -1,11 +1,42 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'open-pull-request-action'
+description: 'Opens a pull-request'
+author: 'thecanadianroot'
 inputs:
-  milliseconds: # change this
+  token:
+    required: false
+    description: 'Your GitHub access token'
+    default: ${{ github.token }}
+  base:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'The base of the pull-request'
+    default: ${{ env.BASE }}
+  head:
+    required: true
+    description: 'The head of the pull-request'
+    default: ${{ env.HEAD }}
+  sha:
+    required: false
+    description: 'The SHA if the head does not exist'
+  title:
+    required: true
+    description: 'The title of the pull-request'
+    default: ${{ env.TITLE }}
+  body:
+    required: false
+    description: 'The body of the pull-request'
+  assignees:
+    required: false
+    description: 'The assignees of the pull-request'
+  reviewers:
+    required: false
+    description: 'The reviewers of the pull-request'
+  owner:
+    required: false
+    description: 'The repository owner'
+  repository:
+    required: false
+    description: 'The repository name'
+
 runs:
   using: 'node16'
   main: 'dist/index.js'

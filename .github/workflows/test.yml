@@ -1,24 +1,23 @@
-name: 'build-test'
-on: # rebuild any PRs and main branch changes
+name: CI - closed pull-request
+
+on:
   pull_request:
-  push:
-    branches:
-      - main
-      - 'releases/*'
+    types: [ closed ]
 
 jobs:
-  build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
+  on-pull-request-merged-on-main:
+    name: On pull-request merged on main
+    runs-on: [ self-hosted, decathlon ]
+    if: |
+      github.event.pull_request.merged && github.event.pull_request.base.ref == 'main'
     steps:
-      - uses: actions/checkout@v2
-      - run: |
-          npm install
-      - run: |
-          npm run all
-  test: # make sure the action works on a clean machine without building
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./
+      - name: test
+        uses: 'thecanadianroot/open-pull-request-action@main'
         with:
-          milliseconds: 1000
+          base: 'pre-production'
+          head: ${{ github.event.pull_request.head.ref }}
+          sha: ${{ github.event.pull_request.merge_commit_sha }}
+          title: ${{ github.event.pull_request.title }}
+          body: ${{ github.event.pull_request.body }}
+          assignees: ${{ toJSON(github.event.pull_request.assignees.*.login) }}
+          reviewers: ${{ toJSON(github.event.pull_request.reviewers.*.login) }}
