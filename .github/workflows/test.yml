@@ -1,0 +1,23 @@
+name: CI - closed pull-request
+
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  on-pull-request-merged-on-main:
+    name: On pull-request merged on main
+    runs-on: ubuntu-latest
+    if: |
+      github.event.pull_request.merged && github.event.pull_request.base.ref == 'main'
+    steps:
+      - name: test
+        uses: 'thecanadianroot/open-pull-request-action@main'
+        with:
+          base: test
+          head: main-to-test-pr-${{ github.event.pull_request.number }}/${{ github.event.pull_request.head.ref }}
+          head-sha: ${{ github.event.pull_request.merge_commit_sha }}
+          title: ${{ github.event.pull_request.title }}
+          body: ${{ github.event.pull_request.body }}
+          assignees: ${{ toJSON(github.event.pull_request.assignees.*.login) }}
+          reviewers: ${{ toJSON(github.event.pull_request.reviewers.*.login) }}

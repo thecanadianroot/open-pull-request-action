@@ -1,0 +1,45 @@
+name: 'open-pull-request-action'
+description: 'Opens a pull-request'
+author: 'thecanadianroot'
+inputs:
+  token:
+    required: false
+    description: 'Your GitHub access token'
+    default: ${{ github.token }}
+  base:
+    required: true
+    description: 'The base of the pull-request.'
+  head:
+    required: true
+    description: 'The head of the pull-request.'
+  title:
+    required: true
+    description: 'The title of the pull-request.'
+  body:
+    required: false
+    description: 'The body of the pull-request.'
+  base-sha:
+    required: false
+    description: 'The SHA from which the base branch should be created if this input is used.'
+  head-sha:
+    required: false
+    description: 'The SHA from which the head branch should be created if this input is used.'
+  assignees:
+    required: false
+    description: 'The assignees of the pull-request.'
+  labels:
+    required: false
+    description: 'The labels of the pull-request.'
+  reviewers:
+    required: false
+    description: 'The reviewers of the pull-request.'
+  owner:
+    required: false
+    description: 'The repository owner.'
+  repository:
+    required: false
+    description: 'The repository name.'
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
