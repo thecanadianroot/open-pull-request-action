@@ -15,7 +15,7 @@ jobs:
         uses: 'thecanadianroot/open-pull-request-action@main'
         with:
           base: 'pre-production'
-          head: ${{ github.event.pull_request.head.ref }}
+          head: refs/heads/main-to-pre-production/${{ github.event.pull_request.head.ref }}
           sha: ${{ github.event.pull_request.merge_commit_sha }}
           title: ${{ github.event.pull_request.title }}
           body: ${{ github.event.pull_request.body }}
