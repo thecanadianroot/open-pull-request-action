@@ -44,6 +44,7 @@ async function run() {
         const reviewers = core.getMultilineInput('reviewers', { required: false }) || process.env.REVIEWERS;
         const owner = core.getInput('owner') || process.env.OWNER || github.context.repo.owner;
         const repo = core.getInput('repository') || process.env.REPOSITORY || github.context.repo.repo;
+        const forceHead = core.getBooleanInput('force-head') || (process.env.FORCE)?.toLowerCase() === 'true' || false;
         if (!token || !base || !head || !title) {
             core.setFailed(`'token', 'base', 'head' and 'title' inputs are required!`);
             return;
@@ -51,13 +52,18 @@ async function run() {
         const octokit = github.getOctokit(token);
         // Create HEAD branch from SHA if any
         if (sha) {
-            const branch = await octokit.rest.git.createRef({
+            const branch = await octokit.rest.git.updateRef({
                 owner,
                 repo,
                 ref: `refs/heads/${head}`,
-                sha
+                sha,
+                force: forceHead
+            }).catch((reason) => {
+                core.setFailed(`Couldn't create head branch: ${reason}`);
+                process.exit(1);
             });
-            core.setOutput('branch', branch.data.ref);
+            core.info(`Created HEAD branch '${head}' from SHA '${sha}': https://github.com/${owner}/${repo}/tree/${head}`);
+            core.setOutput('branch', branch.data);
         }
         // Open pull-request from HEAD to BASE
         const pr = await octokit.rest.pulls.create({
@@ -67,8 +73,12 @@ async function run() {
             body,
             head,
             base
+        }).catch((reason) => {
+            core.setFailed(`Couldn't open pull-request: ${reason}`);
+            process.exit(1);
         });
-        core.setOutput('pull-request', pr.data.number);
+        core.info(`Opened pull-request #${pr.data.number}: https://github.com/${owner}/${repo}/pulls/${pr.data.number}`);
+        core.setOutput('pull-request', pr.data);
         // Add assignees to pull-request if any
         if (assignees) {
             await octokit.rest.issues.addAssignees({
@@ -76,7 +86,7 @@ async function run() {
                 repo,
                 issue_number: pr.data.number,
                 assignees
-            });
+            }).catch((reason) => core.error(`Couldn't add assignees to pull-request #${pr.data.number}: ${reason}`));
         }
         // Add reviewers to pull-request if any.
         if (reviewers) {
@@ -85,7 +95,7 @@ async function run() {
                 repo,
                 pull_number: pr.data.number,
                 reviewers
-            });
+            }).catch((reason) => core.error(`Couldn't add reviewers to pull-request #${pr.data.number}: ${reason}`));
         }
     }
     catch (error) {

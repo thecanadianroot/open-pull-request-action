@@ -33,6 +33,10 @@ inputs:
   repository:
     required: false
     description: 'The repository name'
+  force-head:
+    required: false
+    description: 'Force HEAD branch creation?'
+    default: 'false'
 
 runs:
   using: 'node16'
