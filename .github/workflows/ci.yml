@@ -7,41 +7,6 @@ on:
 
 
 jobs:
-  debug:
-    name: Output event context
-    runs-on: [self-hosted, decathlon]
-    if: |
-      runner.debug == '1'
-    timeout-minutes: 15
-    continue-on-error: true
-    steps:
-      - name: Output event properties
-        uses: actions/github-script@v6
-        env:
-          PROPERTIES: ${{ toJSON(github.event) }}
-        with:
-          script: |
-            console.log('##### Event properties: ');
-            console.log(process.env.PROPERTIES);
-
-      - name: Output GitHub properties
-        uses: actions/github-script@v6
-        env:
-          PROPERTIES: ${{ toJSON(github) }}
-        with:
-          script: |
-            console.log('##### GitHub properties: ');
-            console.log(process.env.PROPERTIES);
-
-      - name: Output runner properties
-        uses: actions/github-script@v6
-        env:
-          PROPERTIES: ${{ toJSON(runner) }}
-        with:
-          script: |
-            console.log('##### Runner properties: ');
-            console.log(process.env.PROPERTIES);
-            
   assert-dist:
     name: Assert dist/
     runs-on: [self-hosted, decathlon]
