@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged && github.event.pull_request.base.ref == 'main'
-    permissions:
-      pull-requests:
     steps:
       - name: test
         uses: 'thecanadianroot/open-pull-request-action@main'
