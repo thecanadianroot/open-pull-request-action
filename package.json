@@ -5,8 +5,8 @@
   "description": "Opens a pull-request",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc",
-    "package": "ncc build --source-map --license licenses.txt",
+    "build": "tsc --newLine lf",
+    "package": "ncc build --source-map --no-cache --license licenses.txt",
     "test": "jest",
     "all": "npm run build && npm run package && npm test"
   },

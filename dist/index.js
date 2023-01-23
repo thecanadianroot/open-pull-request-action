@@ -38,33 +38,35 @@ async function run() {
         const base = core.getInput('base', { required: true });
         const head = core.getInput('head', { required: true });
         const title = core.getInput('title', { required: true });
-        const sha = core.getInput('sha', { required: false }) || process.env.SHA;
         const body = core.getInput('body', { required: false }) || process.env.BODY;
+        const baseSHA = core.getInput('base-sha', { required: false }) || process.env.BASE_SHA;
+        const headSHA = core.getInput('head-sha', { required: false }) || process.env.HEAD_SHA;
         const assignees = core.getMultilineInput('assignees', { required: false }) || process.env.ASSIGNEES;
         const reviewers = core.getMultilineInput('reviewers', { required: false }) || process.env.REVIEWERS;
         const owner = core.getInput('owner') || process.env.OWNER || github.context.repo.owner;
         const repo = core.getInput('repository') || process.env.REPOSITORY || github.context.repo.repo;
-        const forceHead = core.getBooleanInput('force-head') || (process.env.FORCE)?.toLowerCase() === 'true' || false;
         if (!token || !base || !head || !title) {
             core.setFailed(`'token', 'base', 'head' and 'title' inputs are required!`);
             return;
         }
         const octokit = github.getOctokit(token);
-        // Create HEAD branch from SHA if any
-        if (sha) {
-            const branch = await octokit.rest.git.updateRef({
-                owner,
-                repo,
-                ref: `refs/heads/${head}`,
-                sha,
-                force: forceHead
-            }).catch((reason) => {
-                core.setFailed(`Couldn't create head branch: ${reason}`);
-                process.exit(1);
-            });
-            core.info(`Created HEAD branch '${head}' from SHA '${sha}': https://github.com/${owner}/${repo}/tree/${head}`);
-            core.setOutput('branch', branch.data);
+        async function createBranch(name, sha, ref) {
+            if (sha) {
+                const branch = await octokit.rest.git.createRef({
+                    owner,
+                    repo,
+                    ref: `refs/heads/${ref}`,
+                    sha
+                }).catch((reason) => {
+                    core.setFailed(`Couldn't create ${name} branch: ${reason}`);
+                    process.exit(1);
+                });
+                core.info(`Created ${name} branch '${ref}' from SHA '${sha}': https://github.com/${owner}/${repo}/tree/${ref}`);
+                core.setOutput(`${name}-branch`, branch.data);
+            }
         }
+        await createBranch('base', baseSHA, base);
+        await createBranch('head', headSHA, head);
         // Open pull-request from HEAD to BASE
         const pr = await octokit.rest.pulls.create({
             owner,

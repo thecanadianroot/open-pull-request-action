@@ -18,9 +18,12 @@ inputs:
   body:
     required: false
     description: 'The body of the pull-request'
-  sha:
+  base-sha:
     required: false
-    description: 'The SHA if the head does not exist'
+    description: 'The SHA from which the base branch should be created if this input is used.'
+  head-sha:
+    required: false
+    description: 'The SHA from which the head branch should be created if this input is used.'
   assignees:
     required: false
     description: 'The assignees of the pull-request'
@@ -33,10 +36,6 @@ inputs:
   repository:
     required: false
     description: 'The repository name'
-  force-head:
-    required: false
-    description: 'Force HEAD branch creation?'
-    default: 'false'
 
 runs:
   using: 'node16'
