@@ -10,9 +10,9 @@ async function run(): Promise<void> {
         const body: string | undefined = core.getInput('body', {required: false}) || process.env.BODY;
         const baseSHA: string | undefined = core.getInput('base-sha', {required: false}) || process.env.BASE_SHA;
         const headSHA: string | undefined = core.getInput('head-sha', {required: false}) || process.env.HEAD_SHA;
-        const assignees: string[] = core.getMultilineInput('assignees', {required: false}) || process.env.ASSIGNEES;
-        const labels: string[] = core.getMultilineInput('labels', {required: false}) || process.env.LABELS;
-        const reviewers: string[] = core.getMultilineInput('reviewers', {required: false}) || process.env.REVIEWERS;
+        const assignees: string[] | undefined = core.getMultilineInput('assignees', {required: false}) || process.env.ASSIGNEES;
+        const labels: string[] | undefined = core.getMultilineInput('labels', {required: false}) || process.env.LABELS;
+        const reviewers: string[] | undefined = core.getMultilineInput('reviewers', {required: false}) || process.env.REVIEWERS;
         const owner: string = core.getInput('owner') || process.env.OWNER || github.context.repo.owner;
         const repo: string = core.getInput('repository') || process.env.REPOSITORY || github.context.repo.repo;
 
@@ -58,7 +58,7 @@ async function run(): Promise<void> {
         core.setOutput('pull-request', pr.data);
 
         // Add assignees to pull-request if any
-        if (assignees) {
+        if (assignees?.length > 0) {
             await octokit.rest.issues.addAssignees({
                 owner,
                 repo,
@@ -68,7 +68,7 @@ async function run(): Promise<void> {
         }
 
         // Add labels to pull-request if any.
-        if (labels){
+        if (labels?.length > 0){
             await octokit.rest.issues.addLabels({
                 owner,
                 repo,
@@ -78,7 +78,7 @@ async function run(): Promise<void> {
         }
 
         // Add reviewers to pull-request if any.
-        if (reviewers) {
+        if (reviewers?.length > 0) {
             await octokit.rest.pulls.requestReviewers({
                 owner,
                 repo,

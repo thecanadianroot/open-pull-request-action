@@ -83,7 +83,7 @@ async function run() {
         core.info(`Opened pull-request #${pr.data.number}: https://github.com/${owner}/${repo}/pulls/${pr.data.number}`);
         core.setOutput('pull-request', pr.data);
         // Add assignees to pull-request if any
-        if (assignees) {
+        if (assignees?.length > 0) {
             await octokit.rest.issues.addAssignees({
                 owner,
                 repo,
@@ -92,7 +92,7 @@ async function run() {
             }).catch((reason) => core.error(`Couldn't add assignees to pull-request #${pr.data.number}: ${reason}`));
         }
         // Add labels to pull-request if any.
-        if (labels) {
+        if (labels?.length > 0) {
             await octokit.rest.issues.addLabels({
                 owner,
                 repo,
@@ -101,7 +101,7 @@ async function run() {
             });
         }
         // Add reviewers to pull-request if any.
-        if (reviewers) {
+        if (reviewers?.length > 0) {
             await octokit.rest.pulls.requestReviewers({
                 owner,
                 repo,
