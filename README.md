@@ -1,18 +1,58 @@
-<p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
-</p>
+# Open pull-request action
 
-# Create a JavaScript Action using TypeScript
+This action simply opens a pull-request with the specified inputs.
 
-Use this template to bootstrap the creation of a TypeScript action.:rocket:
+## Usage
 
-This template includes compilation support, tests, a validation workflow, publishing, and versioning guidance.  
+```yaml
+- name: Open pull-request
+  uses: 'thecanadianroot/open-pull-request-action@main'
+  with:
+    # The GitHub access token. Uses 'github.token' by default. Type: string
+    token:  
+    
+    # The base branch for the pull-request. Required. Type: string
+    base: 
+    
+    # The SHA from which the base branch should be created if this input is used. Optional, but the base branch must already exist. Type: string
+    base-sha:
+    
+    # The head branch for the pull-request. Required. Type: string
+    head: 
+    
+    # The SHA from which the head branch should be created if this input is used. Optional, but the head branch must already exist. Type: string
+    head-sha:
+    
+    # The pull-request title. Required. Type: string
+    title: 
+    
+    # The pull-request body. Optional. Type: string
+    body: 
+    
+    # The pull-request assignees. Optional. Type: array
+    assignees:
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+    # The pull-request labels. Optional. Type: array
+    labels:
+    
+    # The pull-request reviewers. Optional. Type: array
+    reviewers:
+    
+    # The repository owner. Uses current repository owner if not specified. Type: string
+    owner:
+    
+    # The repository name. Uses current repository name if not specified. Type: string
+    repository: 
+```
 
-## Create an action from this template
+## Outputs
 
-Click the `Use this Template` and provide the new repo details for your action
+| Output         | Expected values                                                                                                 | Conditions                                      |
+|----------------|-----------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
+| `base-branch`  | See [Example response](https://docs.github.com/en/rest/git/refs?apiVersion=2022-11-28#create-a-reference)       | Output will exist if a base branch was created  |
+| `head-branch`  | See [Example response](https://docs.github.com/en/rest/git/refs?apiVersion=2022-11-28#create-a-reference)       | Output will exist if an head branch was created |
+| `pull-request` | See [Example response](https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#create-a-pull-request) | N/A                                             |
+
 
 ## Code in Main
 
@@ -39,66 +79,6 @@ $ npm test
 
 ...
 ```
-
-## Change action.yml
-
-The action.yml defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try { 
-      ...
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos so we will checkin the packed dist folder. 
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run package
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-Your action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml))
-
-```yaml
-uses: ./
-with:
-  milliseconds: 1000
-```
-
-See the [actions tab](https://github.com/actions/typescript-action/actions) for runs of this action! :rocket:
 
 ## Usage:
 

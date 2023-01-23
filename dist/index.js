@@ -42,6 +42,7 @@ async function run() {
         const baseSHA = core.getInput('base-sha', { required: false }) || process.env.BASE_SHA;
         const headSHA = core.getInput('head-sha', { required: false }) || process.env.HEAD_SHA;
         const assignees = core.getMultilineInput('assignees', { required: false }) || process.env.ASSIGNEES;
+        const labels = core.getMultilineInput('labels', { required: false }) || process.env.LABELS;
         const reviewers = core.getMultilineInput('reviewers', { required: false }) || process.env.REVIEWERS;
         const owner = core.getInput('owner') || process.env.OWNER || github.context.repo.owner;
         const repo = core.getInput('repository') || process.env.REPOSITORY || github.context.repo.repo;
@@ -89,6 +90,15 @@ async function run() {
                 issue_number: pr.data.number,
                 assignees
             }).catch((reason) => core.error(`Couldn't add assignees to pull-request #${pr.data.number}: ${reason}`));
+        }
+        // Add labels to pull-request if any.
+        if (labels) {
+            await octokit.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: pr.data.number,
+                labels
+            });
         }
         // Add reviewers to pull-request if any.
         if (reviewers) {
