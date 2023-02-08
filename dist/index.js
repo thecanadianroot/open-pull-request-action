@@ -44,8 +44,11 @@ async function run() {
         const assignees = core.getMultilineInput('assignees', { required: false }) || process.env.ASSIGNEES;
         const labels = core.getMultilineInput('labels', { required: false }) || process.env.LABELS;
         const reviewers = core.getMultilineInput('reviewers', { required: false }) || process.env.REVIEWERS;
-        const owner = core.getInput('owner') || process.env.OWNER || github.context.repo.owner;
         const repo = core.getInput('repository') || process.env.REPOSITORY || github.context.repo.repo;
+        let owner = core.getInput('owner') || process.env.OWNER || github.context.repo.owner;
+        if (repo.includes('/')) {
+            owner = repo.split('/')[1];
+        }
         if (!token || !base || !head || !title) {
             core.setFailed(`'token', 'base', 'head' and 'title' inputs are required!`);
             return;
