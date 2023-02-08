@@ -44,11 +44,13 @@ async function run() {
         const assignees = core.getMultilineInput('assignees', { required: false }) || process.env.ASSIGNEES;
         const labels = core.getMultilineInput('labels', { required: false }) || process.env.LABELS;
         const reviewers = core.getMultilineInput('reviewers', { required: false }) || process.env.REVIEWERS;
-        const repo = core.getInput('repository', { required: false }) || process.env.REPOSITORY || github.context.repo.repo;
         const merge = core.getBooleanInput('merge', { required: false }) || false;
+        let repo = core.getInput('repository', { required: false }) || process.env.REPOSITORY || github.context.repo.repo;
         let owner = core.getInput('owner', { required: false }) || process.env.OWNER || github.context.repo.owner;
         if (repo.includes('/')) {
-            owner = repo.split('/')[1];
+            let split = repo.split('/');
+            owner = split[0];
+            repo = split[1];
         }
         if (!token || !base || !head || !title) {
             core.setFailed(`'token', 'base', 'head' and 'title' inputs are required!`);
@@ -81,7 +83,7 @@ async function run() {
             head,
             base
         }).catch((reason) => {
-            core.setFailed(`Couldn't open pull-request: ${reason}`);
+            core.setFailed(`Couldn't open pull-request on ${owner}/${repo}: ${reason}`);
             process.exit(1);
         });
         core.info(`Opened pull-request #${pr.data.number}: https://github.com/${owner}/${repo}/pulls/${pr.data.number}`);

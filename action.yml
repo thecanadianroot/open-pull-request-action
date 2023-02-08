@@ -36,6 +36,7 @@ inputs:
   merge:
     required: false
     description: 'Merge the pull-request?'
+    default: 'false'
   owner:
     required: false
     description: 'The repository owner.'

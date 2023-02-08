@@ -13,11 +13,13 @@ async function run(): Promise<void> {
         const assignees: string[] | undefined = core.getMultilineInput('assignees', {required: false}) || process.env.ASSIGNEES;
         const labels: string[] | undefined = core.getMultilineInput('labels', {required: false}) || process.env.LABELS;
         const reviewers: string[] | undefined = core.getMultilineInput('reviewers', {required: false}) || process.env.REVIEWERS;
-        const repo: string = core.getInput('repository', {required: false}) || process.env.REPOSITORY || github.context.repo.repo;
         const merge: boolean = core.getBooleanInput('merge', {required: false}) || false;
+        let repo: string = core.getInput('repository', {required: false}) || process.env.REPOSITORY || github.context.repo.repo;
         let owner = core.getInput('owner', {required: false}) || process.env.OWNER || github.context.repo.owner;
         if (repo.includes('/')){
-            owner = repo.split('/')[1];
+            let split = repo.split('/');
+            owner = split[0];
+            repo = split[1];
         }
 
         if (!token || !base || !head || !title) {
@@ -55,7 +57,7 @@ async function run(): Promise<void> {
             head,
             base
         }).catch((reason) => {
-            core.setFailed(`Couldn't open pull-request: ${reason}`);
+            core.setFailed(`Couldn't open pull-request on ${owner}/${repo}: ${reason}`);
             process.exit(1);
         });
         core.info(`Opened pull-request #${pr.data.number}: https://github.com/${owner}/${repo}/pulls/${pr.data.number}`)
