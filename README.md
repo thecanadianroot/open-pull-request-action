@@ -38,10 +38,13 @@ This action simply opens a pull-request with the specified inputs.
     # The pull-request reviewers. Optional. Type: array
     reviewers:
     
+    # Merge the pull-request? Uses false by default. Type: boolean 
+    merge: 
+    
     # The repository owner. Uses current repository owner if not specified. Type: string
     owner:
     
-    # The repository name. Uses current repository name if not specified. Type: string
+    # The repository name (can be either 'organization/repository' or 'repository' format). Uses current repository name if not specified. Type: string
     repository: 
 ```
 
@@ -51,7 +54,7 @@ This action simply opens a pull-request with the specified inputs.
 |----------------|-----------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
 | `base-branch`  | See [Example response](https://docs.github.com/en/rest/git/refs?apiVersion=2022-11-28#create-a-reference)       | Output will exist if a base branch was created  |
 | `head-branch`  | See [Example response](https://docs.github.com/en/rest/git/refs?apiVersion=2022-11-28#create-a-reference)       | Output will exist if an head branch was created |
-| `pull-request` | See [Example response](https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#create-a-pull-request) | N/A                                             |
+| `pull-request` | See [Example response](https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#create-a-pull-request) | Always present                                  |
 
 
 ## Code in Main
@@ -71,15 +74,7 @@ $ npm run build && npm run package
 Run the tests :heavy_check_mark:  
 ```bash
 $ npm test
-
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
 ```
 
 ## Usage:
 
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
