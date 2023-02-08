@@ -44,8 +44,9 @@ async function run() {
         const assignees = core.getMultilineInput('assignees', { required: false }) || process.env.ASSIGNEES;
         const labels = core.getMultilineInput('labels', { required: false }) || process.env.LABELS;
         const reviewers = core.getMultilineInput('reviewers', { required: false }) || process.env.REVIEWERS;
-        const repo = core.getInput('repository') || process.env.REPOSITORY || github.context.repo.repo;
-        let owner = core.getInput('owner') || process.env.OWNER || github.context.repo.owner;
+        const repo = core.getInput('repository', { required: false }) || process.env.REPOSITORY || github.context.repo.repo;
+        const merge = core.getBooleanInput('merge', { required: false }) || false;
+        let owner = core.getInput('owner', { required: false }) || process.env.OWNER || github.context.repo.owner;
         if (repo.includes('/')) {
             owner = repo.split('/')[1];
         }
@@ -111,6 +112,13 @@ async function run() {
                 pull_number: pr.data.number,
                 reviewers
             }).catch((reason) => core.error(`Couldn't add reviewers to pull-request #${pr.data.number}: ${reason}`));
+        }
+        if (merge) {
+            await octokit.rest.pulls.merge({
+                owner,
+                repo,
+                pull_number: pr.data.number
+            });
         }
     }
     catch (error) {

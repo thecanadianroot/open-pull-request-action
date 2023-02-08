@@ -13,8 +13,9 @@ async function run(): Promise<void> {
         const assignees: string[] | undefined = core.getMultilineInput('assignees', {required: false}) || process.env.ASSIGNEES;
         const labels: string[] | undefined = core.getMultilineInput('labels', {required: false}) || process.env.LABELS;
         const reviewers: string[] | undefined = core.getMultilineInput('reviewers', {required: false}) || process.env.REVIEWERS;
-        const repo: string = core.getInput('repository') || process.env.REPOSITORY || github.context.repo.repo;
-        let owner = core.getInput('owner') || process.env.OWNER || github.context.repo.owner;
+        const repo: string = core.getInput('repository', {required: false}) || process.env.REPOSITORY || github.context.repo.repo;
+        const merge: boolean = core.getBooleanInput('merge', {required: false}) || false;
+        let owner = core.getInput('owner', {required: false}) || process.env.OWNER || github.context.repo.owner;
         if (repo.includes('/')){
             owner = repo.split('/')[1];
         }
@@ -88,6 +89,13 @@ async function run(): Promise<void> {
                 pull_number: pr.data.number,
                 reviewers
             }).catch((reason) => core.error(`Couldn't add reviewers to pull-request #${pr.data.number}: ${reason}`));
+        }
+        if (merge) {
+            await octokit.rest.pulls.merge({
+                owner,
+                repo,
+                pull_number: pr.data.number
+            })
         }
     } catch (error) {
         if (error instanceof Error) core.setFailed(error.message)

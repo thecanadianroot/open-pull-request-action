@@ -33,6 +33,9 @@ inputs:
   reviewers:
     required: false
     description: 'The reviewers of the pull-request.'
+  merge:
+    required: false
+    description: 'Merge the pull-request?'
   owner:
     required: false
     description: 'The repository owner.'
