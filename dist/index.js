@@ -86,7 +86,7 @@ async function run() {
             core.setFailed(`Couldn't open pull-request on ${owner}/${repo}: ${reason}`);
             process.exit(1);
         });
-        core.info(`Opened pull-request #${pr.data.number}: https://github.com/${owner}/${repo}/pulls/${pr.data.number}`);
+        core.info(`Opened pull-request #${pr.data.number}: ${pr.data.html_url}`);
         core.setOutput('pull-request', pr.data);
         // Add assignees to pull-request if any
         if (assignees?.length > 0) {
@@ -113,7 +113,7 @@ async function run() {
                 repo,
                 pull_number: pr.data.number,
                 reviewers
-            }).catch((reason) => core.error(`Couldn't add reviewers to pull-request #${pr.data.number}: ${reason}`));
+            }).catch((reason) => core.error(`Couldn't request reviewers for pull-request #${pr.data.number}: ${reason}`));
         }
         if (merge) {
             await octokit.rest.pulls.merge({
