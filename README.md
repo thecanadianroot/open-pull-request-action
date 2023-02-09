@@ -35,8 +35,11 @@ This action simply opens a pull-request with the specified inputs.
     # The pull-request labels. Optional. Type: array
     labels:
     
-    # The pull-request reviewers. Optional. Type: array
+    # The pull-request reviewers (Use this for specific users). Optional. Type: array
     reviewers:
+
+    # The pull-request team reviewers (Use this for organization teams). Optional. Type: array
+    team-reviewers:
     
     # Merge the pull-request? Uses false by default. Type: boolean 
     merge: 
