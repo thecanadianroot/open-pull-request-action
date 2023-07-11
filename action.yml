@@ -40,6 +40,9 @@ inputs:
     required: false
     description: 'Merge the pull-request?'
     default: 'false'
+  merge-method:
+    required: false
+    description: 'The merge method of the pull-request (choices: merge, squash, rebase).'
   owner:
     required: false
     description: 'The repository owner.'

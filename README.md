@@ -44,6 +44,9 @@ This action simply opens a pull-request with the specified inputs.
     # Merge the pull-request? Uses false by default. Type: boolean 
     merge: 
     
+    # The merge method of the pull-request (choices: merge, squash, rebase). Uses 'squash' method if merge is set to true. Optional. Type: string
+    merge-method: 
+    
     # The repository owner. Uses current repository owner if not specified. Type: string
     owner:
     

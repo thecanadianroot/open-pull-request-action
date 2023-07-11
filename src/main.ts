@@ -14,7 +14,8 @@ async function run(): Promise<void> {
         const labels: string[] | undefined = core.getMultilineInput('labels', {required: false}) || process.env.LABELS;
         const reviewers: string[] | undefined = core.getMultilineInput('reviewers', {required: false}) || process.env.REVIEWERS;
         const teamReviewers: string[] | undefined = core.getMultilineInput('team-reviewers', {required: false}) || process.env.TEAM_REVIEWERS;
-        const merge: boolean = core.getBooleanInput('merge', {required: false}) || false;
+        const merge: boolean = core.getBooleanInput('merge', {required: false}) || (process.env.MERGE?.toLowerCase() === 'true') || false;
+        const mergeMethod: "merge" | "squash" | "rebase" | undefined = (core.getInput('merge-method', {required: false}) || process.env.MERGE_METHOD) as "merge" | "squash" | "rebase" | undefined || 'squash';
         let repo: string = core.getInput('repository', {required: false}) || process.env.REPOSITORY || github.context.repo.repo;
         let owner = core.getInput('owner', {required: false}) || process.env.OWNER || github.context.repo.owner;
         if (repo.includes('/')){
@@ -98,7 +99,8 @@ async function run(): Promise<void> {
             await octokit.rest.pulls.merge({
                 owner,
                 repo,
-                pull_number: pr.data.number
+                pull_number: pr.data.number,
+                merge_method: mergeMethod
             })
         }
     } catch (error) {
