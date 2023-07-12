@@ -6,7 +6,7 @@ This action simply opens a pull-request with the specified inputs.
 
 ```yaml
 - name: Open pull-request
-  uses: 'thecanadianroot/open-pull-request-action@main'
+  uses: 'thecanadianroot/open-pull-request-action@v1'
   with:
     # The GitHub access token. Uses 'github.token' by default. Type: string
     token:  
