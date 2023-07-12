@@ -43,6 +43,23 @@ inputs:
   merge-method:
     required: false
     description: 'The merge method of the pull-request (choices: merge, squash, rebase).'
+    default: 'squash'
+  fail-on-add-assignees-failure:
+    required: false
+    description: 'Mark this action as failed on add assignees failure?'
+    default: 'true'
+  fail-on-add-labels-failure:
+    required: false
+    description: 'Mark this action as failed on add labels failure?'
+    default: 'true'
+  fail-on-request-reviewers-failure:
+    required: false
+    description: 'Mark this action as failed on request reviewers failure?'
+    default: 'true'
+  fail-on-merge-failure:
+    required: false
+    description: 'Mark this action as failed on merge failure?'
+    default: 'true'
   owner:
     required: false
     description: 'The repository owner.'
