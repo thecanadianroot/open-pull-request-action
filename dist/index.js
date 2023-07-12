@@ -106,7 +106,7 @@ async function run() {
                 }
                 core.warning(message);
             });
-            core.info(`Added assignees to pull-request #${pr.data.number}: ${assignees}`);
+            core.info(`Added assignees to pull-request #${pr.data.number}: ${assignees.join(", ")}`);
         }
         // Add labels to pull-request if any.
         if (labels?.length > 0) {
@@ -122,7 +122,7 @@ async function run() {
                 }
                 core.warning(message);
             });
-            core.info(`Added labels to pull-request #${pr.data.number}: ${labels}`);
+            core.info(`Added labels to pull-request #${pr.data.number}: ${labels.join(", ")}`);
         }
         // Add reviewers to pull-request if any.
         if (reviewers?.length > 0 || teamReviewers?.length > 0) {

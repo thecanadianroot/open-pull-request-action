@@ -83,7 +83,7 @@ async function run(): Promise<void> {
                 }
                 core.warning(message);
             });
-            core.info(`Added assignees to pull-request #${pr.data.number}: ${assignees}`);
+            core.info(`Added assignees to pull-request #${pr.data.number}: ${assignees.join(", ")}`);
         }
 
         // Add labels to pull-request if any.
@@ -100,7 +100,7 @@ async function run(): Promise<void> {
                 }
                 core.warning(message);
             });
-            core.info(`Added labels to pull-request #${pr.data.number}: ${labels}`);
+            core.info(`Added labels to pull-request #${pr.data.number}: ${labels.join(", ")}`);
         }
 
         // Add reviewers to pull-request if any.
