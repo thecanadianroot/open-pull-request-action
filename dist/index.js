@@ -32,12 +32,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-function handleFailure(message, doFail) {
-    if (doFail) {
-        core.setFailed(message);
-        process.exit(1);
-    }
-}
 async function run() {
     try {
         const token = core.getInput('token', { required: true });
@@ -112,6 +106,7 @@ async function run() {
                 }
                 core.warning(message);
             });
+            core.info(`Added assignees to pull-request #${pr.data.number}: ${assignees}`);
         }
         // Add labels to pull-request if any.
         if (labels?.length > 0) {
@@ -127,6 +122,7 @@ async function run() {
                 }
                 core.warning(message);
             });
+            core.info(`Added labels to pull-request #${pr.data.number}: ${labels}`);
         }
         // Add reviewers to pull-request if any.
         if (reviewers?.length > 0 || teamReviewers?.length > 0) {
@@ -143,9 +139,11 @@ async function run() {
                 }
                 core.warning(message);
             });
+            core.info(`Added reviewers to pull-request #${pr.data.number}: ${[...reviewers, ...teamReviewers].join(", ")}`);
         }
+        // Merge the pull-request if enabled.
         if (merge) {
-            await octokit.rest.pulls.merge({
+            const merged = await octokit.rest.pulls.merge({
                 owner,
                 repo,
                 pull_number: pr.data.number,
@@ -157,6 +155,7 @@ async function run() {
                 }
                 core.warning(message);
             });
+            core.info(`Merged pull-request #${pr.data.number}: https://github.com/${owner}/${repo}/commit/${merged?.data.sha}`);
         }
     }
     catch (error) {

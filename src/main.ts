@@ -64,7 +64,7 @@ async function run(): Promise<void> {
             head,
             base
         }).catch((reason) => {
-            throw new Error(`Couldn't open pull-request on ${owner}/${repo}: ${reason}`)
+            throw new Error(`Couldn't open pull-request on ${owner}/${repo}: ${reason}`);
         });
         core.info(`Opened pull-request #${pr.data.number}: ${pr.data.html_url}`)
         core.setOutput('pull-request', pr.data);
@@ -83,6 +83,7 @@ async function run(): Promise<void> {
                 }
                 core.warning(message);
             });
+            core.info(`Added assignees to pull-request #${pr.data.number}: ${assignees}`);
         }
 
         // Add labels to pull-request if any.
@@ -99,6 +100,7 @@ async function run(): Promise<void> {
                 }
                 core.warning(message);
             });
+            core.info(`Added labels to pull-request #${pr.data.number}: ${labels}`);
         }
 
         // Add reviewers to pull-request if any.
@@ -116,9 +118,12 @@ async function run(): Promise<void> {
                 }
                 core.warning(message);
             });
+            core.info(`Added reviewers to pull-request #${pr.data.number}: ${[...reviewers, ...teamReviewers].join(", ")}`)
         }
+
+        // Merge the pull-request if enabled.
         if (merge) {
-            await octokit.rest.pulls.merge({
+            const merged = await octokit.rest.pulls.merge({
                 owner,
                 repo,
                 pull_number: pr.data.number,
@@ -130,6 +135,7 @@ async function run(): Promise<void> {
                 }
                 core.warning(message);
             });
+            core.info(`Merged pull-request #${pr.data.number}: https://github.com/${owner}/${repo}/commit/${merged?.data.sha}`);
         }
     } catch (error) {
         if (error instanceof Error) core.setFailed(error.message);
