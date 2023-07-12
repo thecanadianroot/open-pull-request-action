@@ -1,15 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
-
-function handleFailure(message: string, doFail: boolean){
-    if (doFail){
-        core.setFailed(message);
-        process.exit(1);
-    }
-
-}
-
 async function run(): Promise<void> {
     try {
         const token: string | undefined = core.getInput('token', {required: true});
