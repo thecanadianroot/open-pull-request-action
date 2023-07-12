@@ -14,10 +14,17 @@ async function run(): Promise<void> {
         const labels: string[] | undefined = core.getMultilineInput('labels', {required: false}) || process.env.LABELS;
         const reviewers: string[] | undefined = core.getMultilineInput('reviewers', {required: false}) || process.env.REVIEWERS;
         const teamReviewers: string[] | undefined = core.getMultilineInput('team-reviewers', {required: false}) || process.env.TEAM_REVIEWERS;
-        const merge: boolean = core.getBooleanInput('merge', {required: false}) || false;
+        const merge: boolean = core.getBooleanInput('merge', {required: false}) || (process.env.MERGE?.toLowerCase() === 'true') || false;
+        const mergeMethod: "merge" | "squash" | "rebase" | undefined = (core.getInput('merge-method', {required: false}) || process.env.MERGE_METHOD) as "merge" | "squash" | "rebase" | undefined || 'squash';
+
+        const failOnAddAssigneesFailure: boolean = core.getBooleanInput('fail-on-add-assignees-failure', {required: false}) || (process.env.FAIL_ON_ADD_ASSIGNEES_FAILURE?.toLowerCase() === 'true') || true;
+        const failOnAddLabelsFailure: boolean = core.getBooleanInput('fail-on-add-labels-failure', {required: false}) || (process.env.FAIL_ON_ADD_LABELS_FAILURE?.toLowerCase() === 'true') || true;
+        const failOnRequestReviewersFailure: boolean = core.getBooleanInput('fail-on-request-reviewers-failure', {required: false}) || (process.env.FAIL_ON_REQUEST_REVIEWERS_FAILURE?.toLowerCase() === 'true') || true;
+        const failOnMergeFailure: boolean = core.getBooleanInput('fail-on-merge-failure', {required: false}) || (process.env.FAIL_ON_MERGE_FAILURE?.toLowerCase() === 'true') || true;
+
         let repo: string = core.getInput('repository', {required: false}) || process.env.REPOSITORY || github.context.repo.repo;
         let owner = core.getInput('owner', {required: false}) || process.env.OWNER || github.context.repo.owner;
-        if (repo.includes('/')){
+        if (repo.includes('/')) {
             let split = repo.split('/');
             owner = split[0];
             repo = split[1];
@@ -38,8 +45,7 @@ async function run(): Promise<void> {
                     ref: `refs/heads/${ref}`,
                     sha
                 }).catch((reason) => {
-                    core.setFailed(`Couldn't create ${name} branch: ${reason}`);
-                    process.exit(1);
+                    throw new Error(`Couldn't create ${name} branch: ${reason}`);
                 });
                 core.info(`Created ${name} branch '${ref}' from SHA '${sha}': https://github.com/${owner}/${repo}/tree/${ref}`)
                 core.setOutput(`${name}-branch`, branch.data);
@@ -58,8 +64,7 @@ async function run(): Promise<void> {
             head,
             base
         }).catch((reason) => {
-            core.setFailed(`Couldn't open pull-request on ${owner}/${repo}: ${reason}`);
-            process.exit(1);
+            throw new Error(`Couldn't open pull-request on ${owner}/${repo}: ${reason}`);
         });
         core.info(`Opened pull-request #${pr.data.number}: ${pr.data.html_url}`)
         core.setOutput('pull-request', pr.data);
@@ -71,17 +76,31 @@ async function run(): Promise<void> {
                 repo,
                 issue_number: pr.data.number,
                 assignees
-            }).catch((reason) => core.error(`Couldn't add assignees to pull-request #${pr.data.number}: ${reason}`));
+            }).catch((reason) => {
+                const message = `Couldn't add assignees to pull-request #${pr.data.number}: ${reason}`;
+                if (failOnAddAssigneesFailure) {
+                    throw new Error(message);
+                }
+                core.warning(message);
+            });
+            core.info(`Added assignees to pull-request #${pr.data.number}: ${assignees}`);
         }
 
         // Add labels to pull-request if any.
-        if (labels?.length > 0){
+        if (labels?.length > 0) {
             await octokit.rest.issues.addLabels({
                 owner,
                 repo,
                 issue_number: pr.data.number,
                 labels
-            })
+            }).catch((reason) => {
+                const message = `Couldn't add labels to pull-request #${pr.data.number}: ${reason}`;
+                if (failOnAddLabelsFailure) {
+                    throw new Error(message);
+                }
+                core.warning(message);
+            });
+            core.info(`Added labels to pull-request #${pr.data.number}: ${labels}`);
         }
 
         // Add reviewers to pull-request if any.
@@ -92,17 +111,34 @@ async function run(): Promise<void> {
                 pull_number: pr.data.number,
                 reviewers: reviewers,
                 team_reviewers: teamReviewers
-            }).catch((reason) => core.error(`Couldn't request reviewers for pull-request #${pr.data.number}: ${reason}`));
+            }).catch((reason) => {
+                const message = `Couldn't request reviewers for pull-request #${pr.data.number}: ${reason}`;
+                if (failOnRequestReviewersFailure) {
+                    throw new Error(message);
+                }
+                core.warning(message);
+            });
+            core.info(`Added reviewers to pull-request #${pr.data.number}: ${[...reviewers, ...teamReviewers].join(", ")}`)
         }
+
+        // Merge the pull-request if enabled.
         if (merge) {
-            await octokit.rest.pulls.merge({
+            const merged = await octokit.rest.pulls.merge({
                 owner,
                 repo,
-                pull_number: pr.data.number
-            })
+                pull_number: pr.data.number,
+                merge_method: mergeMethod
+            }).catch((reason) => {
+                const message = `Couldn't merge pull-request #${pr.data.number} using merge method ${mergeMethod}: ${reason}`;
+                if (failOnMergeFailure) {
+                    throw new Error(message);
+                }
+                core.warning(message);
+            });
+            core.info(`Merged pull-request #${pr.data.number}: https://github.com/${owner}/${repo}/commit/${merged?.data.sha}`);
         }
     } catch (error) {
-        if (error instanceof Error) core.setFailed(error.message)
+        if (error instanceof Error) core.setFailed(error.message);
     }
 }
 

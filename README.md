@@ -44,6 +44,21 @@ This action simply opens a pull-request with the specified inputs.
     # Merge the pull-request? Uses false by default. Type: boolean 
     merge: 
     
+    # The merge method of the pull-request (choices: merge, squash, rebase). Uses squash merge method by default if merge is enabled. Optional. Type: string
+    merge-method:
+
+    # Mark this action as failed on add assignees failure? Uses true by default if assignees are specified. Optional. Type: boolean
+    fail-on-add-assignees-failure:
+
+    # Mark this action as failed on add labels failure? Uses true by default if labels are specified. Optional. Type: boolean
+    fail-on-add-labels-failure:
+
+    # Mark this action as failed on request reviewers failure? Uses true by default if reviewers or team-reviewers are specified. Optional. Type: boolean
+    fail-on-request-reviewers-failure:
+      
+    # Mark this action as failed on merge failure? Uses true by default if merge is enabled. Optional. Type: boolean
+    fail-on-merge-failure:
+    
     # The repository owner. Uses current repository owner if not specified. Type: string
     owner:
     
